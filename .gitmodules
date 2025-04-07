@@ -1,0 +1,3 @@
+[submodule "sources/wgscraper"]
+	path = sources/wgscraper
+	url = https://github.com/yann112/windguru-scraper.git
