@@ -1,6 +1,7 @@
 import json
 from pathlib import Path
 from typing import Dict, Any, Optional
+from datetime import date, timedelta
 
 from .llm import OpenRouterClient
 from ..wgscraper.sources.wgscraper.scraper import ScraperWg
@@ -32,25 +33,49 @@ class SurfReportPromptGenerator:
         Returns:
             str: The complete prompt for the LLM
         """
-        # Generate the prompt for the LLM using the pre-organized forecast data
+        today = date.today()
+        tomorrow = today + timedelta(days=1)
+        tomorrow_str_long = tomorrow.strftime('%A %d %B')
+        
         prompt = f"""
-            Générez un rapport de surf concis pour aujourd'hui en utilisant les données suivantes :
+            🏄‍♂️🤙 Report de surf **TRÈS COURT** pour demain, {tomorrow_str_long}, mode surfeur cool et **ULTRA CONCIS** pour SMS.
 
-            Prévisions : {json.dumps(forecast_data, indent=2, ensure_ascii=False)}
+            Date du jour : {today.strftime('%A %d %B')}
 
-            Informations sur la plage locale :
-            - Nom : {self.local_beach_info['name']}
-            - Lieu : {self.local_beach_info['location']}
+            **Infos Spot :**
+            - Nom : {self.local_beach_info['name']} ({self.local_beach_info['location']})
             - Description : {self.local_beach_info['description']}
-            - Meilleures conditions : {self.local_beach_info['best_conditions']}
+            - {self.local_beach_info['perfect_wave_conditions']}
+            - {self.local_beach_info['perfect_wind_conditions']}
+            - {self.local_beach_info.get('best_tide_window', '')}
 
-            Le rapport doit inclure :
-            - Conditions de surf globales pour la journée.
-            - Informations détaillées sur la vitesse du vent, la vitesse des rafales, la direction du vent, la hauteur de la houle, la période de la houle, la direction de la houle, la température, la couverture nuageuse et les précipitations.
-            - Recommandations basées sur les meilleures conditions pour surfer sur ce spot.
-            - Tout conseil ou avertissement supplémentaire pour les surfeurs.
+            **Avertissements :**
+            - {self.local_beach_info.get('wave_height_warning', '')}
+            - {self.local_beach_info.get('strong_offshore_wind_effect', '')}
+            - {self.local_beach_info.get('high_tide_shorebreak_warning', '')}
+            - {self.local_beach_info.get('rip_current_warning', '')}
+            - **Seuil approximatif fort coefficient de marée :** ~{self.local_beach_info.get('strong_tide_approx', 85)}
 
-            Le rapport doit être en français et concis, adapté pour être envoyé via WhatsApp. Si des conditions meilleures sont prévues dans les prochains jours, veuillez les notifier.
+            **Prévisions Brutes (pour analyse) :**
+            ```
+            {json.dumps(forecast_data, indent=2, ensure_ascii=False)}
+            ```
+
+            **Objectif :** Indique en quelques mots si ça vaut le coup de surfer demain (matin/midi/soir), en te basant sur les prévisions de vent et de houle et les infos du spot.
+
+            **Analyse Concise :**
+            - **Vent :** Indique direction et force (faible, modéré, fort). Signale si offshore (idéal si faible).
+            - **Houle :** Indique hauteur et période. Signale si dans la fenêtre parfaite (0.5m-1.1m / 8s-12s). Signale si > 1.2m (engagé).
+            - **Marée :** Indique niveau (haute, basse, mi-marée) si info dispo. Signale coeff > ~85 si info dispo.
+
+            **Format SMS (ULTRA COURT) :**
+            - **Matin :** (Qualité (Top/Moyen/Bof) + Vent + Houle + Marée (si pert.) + Alertes si besoin) ⏰
+            - **Midi :** (Idem) 🍔
+            - **Soir :** (Idem) 🌅
+            - **Tendance :** (Évolution houle/vent) 📈/⬇️
+            - **Conclusion :** (Go/No Go) 🤙/👎
+
+            **Consignes :** Très concis, style surfeur simple, infos vérifiées, emojis sparingly, jours ouvrés only. Merci ! 🤙
             """
         return prompt
     
@@ -96,12 +121,19 @@ class SurfReportService:
         self.browser = browser
         self.headless = headless
         
-        # Beach information
         self.local_beach_info = {
             "name": "Plage du Métro",
             "location": "Tarnos, France",
-            "description": "Un spot de surf populaire connu pour ses vagues constantes et son paysage magnifique.",
-            "best_conditions": "Les meilleures conditions sont généralement avec des vents d'est (offshore) et une hauteur de houle d'environ 1 mètre avec une période de 9-10 secondes."
+            "description": "Beach break landais populaire. Spot réputé pour ses pics changeants et son ambiance conviviale.",
+            "perfect_wave_conditions": "🌊 **Parfait :** Houle 0.5m-1.1m / période 8s-12s.",
+            "perfect_wind_conditions": "🌬️ **Parfait :** Vent faible (0-10 nœuds) et offshore (NE à SE).",
+            "wave_height_warning": "⚠️ **Attention :** Houle > 1.2m = conditions engagées (vagues creuses et puissantes).",
+            "strong_offshore_wind_threshold_knots": 15,
+            "strong_offshore_wind_effect": f"💨 **Attention :** Vent offshore > {15} nœuds = take-off difficile (vagues trop creuses).",
+            "strong_tide_approx": 100,
+            "high_tide_shorebreak_warning": "⚠️ **Attention :** Marée haute (coeff > ~85) = shorebreak dangereux.",
+            "rip_current_warning": "⚠️ **Attention :** Marée descendante (coeff > ~85) = forts courants/baïnes.",
+            "best_tide_window": "🏄‍♂️ **Meilleur à mi-marée.**"
         }
         
         # Initialize OpenRouter client

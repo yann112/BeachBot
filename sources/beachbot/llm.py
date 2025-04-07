@@ -11,7 +11,7 @@ class OpenRouterClient:
             logger = None,
             api_key=None,
             model="mistralai/mistral-small-3.1-24b-instruct",
-            max_tokens=400
+            max_tokens=1200
                 ):
         self.logger = logger or logging.getLogger(__file__)
         self.api_key = api_key or os.environ.get("OPEN_ROUTER_API_KEY")
