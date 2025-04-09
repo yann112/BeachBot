@@ -60,20 +60,21 @@ class SurfReportPromptGenerator:
             ```
             {json.dumps(forecast_data, indent=2, ensure_ascii=False)}
             ```
-
+ 
             **Objectif :** Indique en quelques mots si ça vaut le coup de surfer demain (matin/midi/soir), en te basant sur les prévisions de vent et de houle et les infos du spot.
 
             **Analyse Concise :**
             - **Vent :** Indique direction et force (faible, modéré, fort). Signale si offshore (idéal si faible).
             - **Houle :** Indique hauteur et période. Signale si dans la fenêtre parfaite (0.5m-1.1m / 8s-12s). Signale si > 1.2m (engagé).
             - **Marée :** Indique niveau (haute, basse, mi-marée) si info dispo. Signale coeff > ~85 si info dispo.
-
+ 
             **Format SMS (ULTRA COURT) :**
             - **Matin :** (Qualité (Top/Moyen/Bof) + Vent + Houle + Marée (si pert.) + Alertes si besoin) ⏰
             - **Midi :** (Idem) 🍔
-            - **Soir :** (Idem) 🌅
+            - **Soir :** (Idem) 🌅 
             - **Tendance :** (Évolution houle/vent) 📈/⬇️
-            - **Conclusion :** (Go/No Go) 🤙/👎
+            - **Conclusion :** (Go/No Go) 🤙/👎 
+            - **La blague a Alex** type "https://jokes-de-papa.com/", par contre reste trés serieux pour le reste du report
 
             **Consignes :** Très concis, style surfeur simple, infos vérifiées, emojis sparingly, jours ouvrés only. Merci ! 🤙
             """
