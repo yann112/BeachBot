@@ -23,7 +23,8 @@ def test_generate_surf_report():
         url=TEST_URL,
         station_number=STATION_NUMBER,
         browser="chrome",
-        headless=True
+        headless=True,
+        model = "openrouter/quasar-alpha"
     )
     
     # Generate a surf report and verify it's not empty

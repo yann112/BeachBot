@@ -105,7 +105,7 @@ class SurfReportService:
     A service class that coordinates scraping weather data and generating surf reports.
     """
     
-    def __init__(self, config_path: str, url: str, station_number: int, browser: str = "chrome", headless: bool = True):
+    def __init__(self, config_path: str, url: str, station_number: int, browser: str = "chrome", headless: bool = True, model: str = None):
         """
         Initialize the SurfReportService.
         
@@ -121,6 +121,7 @@ class SurfReportService:
         self.station_number = station_number
         self.browser = browser
         self.headless = headless
+        self.model=model
         
         self.local_beach_info = {
             "name": "Plage du Métro",
@@ -138,7 +139,7 @@ class SurfReportService:
         }
         
         # Initialize OpenRouter client
-        self.llm_client = OpenRouterClient()
+        self.llm_client = OpenRouterClient(model=self.model)
         
         # Initialize prompt generator
         self.prompt_generator = SurfReportPromptGenerator(self.local_beach_info, self.llm_client)
