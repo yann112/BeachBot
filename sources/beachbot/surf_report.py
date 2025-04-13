@@ -65,18 +65,18 @@ class SurfReportPromptGenerator:
 
             **Analyse Concise :**
             - **Vent :** Indique direction et force (faible, modéré, fort). Signale si offshore (idéal si faible).
-            - **Houle :** Indique hauteur et période. Signale si dans la fenêtre parfaite (0.5m-1.1m / 8s-12s). Signale si > 1.2m (engagé).
-            - **Marée :** Indique niveau (haute, basse, mi-marée) si info dispo. Signale coeff > ~85 si info dispo.
+            - **Houle :** Indique hauteur et période. Signale si dans la fenêtre parfaite (0.5m-1.5m / 8s-12s).
+            - **Marée :** Indique niveau (haute, basse, mi-marée) si info dispo.
  
             **Format SMS (ULTRA COURT) :**
-            - **Matin :** (Qualité (Top/Moyen/Bof) + Vent + Houle + Marée (si pert.) + Alertes si besoin) ⏰
+            - **Matin :** (Qualité (Top/Moyen/Bof) + Vent + Houle + Marée + Alertes si besoin) ⏰
             - **Midi :** (Idem) 🍔
             - **Soir :** (Idem) 🌅 
             - **Tendance :** (Évolution houle/vent) 📈/⬇️
             - **Conclusion :** (Go/No Go) 🤙/👎 
-            - **La blague a Alex** type "https://jokes-de-papa.com/", par contre reste trés serieux pour le reste du report
+            - **La blague a Alex::**
 
-            **Consignes :** Très concis, style surfeur simple, infos vérifiées, emojis sparingly, jours ouvrés only. Merci ! 🤙
+            **Consignes :** Très concis, style surfeur simple, infos vérifiées, emojis sparingly, jours ouvrés only,  blague type "https://jokes-de-papa.com/" par contre reste trés serieux pour le reste du report,. Merci ! 🤙
             """
         return prompt
     
@@ -127,14 +127,12 @@ class SurfReportService:
             "name": "Plage du Métro",
             "location": "Tarnos, France",
             "description": "Beach break landais populaire. Spot réputé pour ses pics changeants et son ambiance conviviale.",
-            "perfect_wave_conditions": "🌊 **Parfait :** Houle 0.5m-1.1m / période 8s-12s.",
-            "perfect_wind_conditions": "🌬️ **Parfait :** Vent faible (0-10 nœuds) et offshore (NE à SE).",
-            "wave_height_warning": "⚠️ **Attention :** Houle > 1.2m = conditions engagées (vagues creuses et puissantes).",
+            "perfect_wave_conditions": "🌊 **Parfait :** Houle 0.5m-1.5m / période 8s-12s.",
+            "perfect_wind_conditions": "🌬️ **Parfait :** Vent faible (0-10 nœuds) et/ou offshore (NE à SE).",
+            "wave_height_warning": "⚠️ **Attention :** Houle > 1.5m = conditions engagées (vagues creuses et puissantes).",
             "strong_offshore_wind_threshold_knots": 15,
             "strong_offshore_wind_effect": f"💨 **Attention :** Vent offshore > {15} nœuds = take-off difficile (vagues trop creuses).",
-            "strong_tide_approx": 100,
-            "high_tide_shorebreak_warning": "⚠️ **Attention :** Marée haute (coeff > ~85) = shorebreak dangereux.",
-            "rip_current_warning": "⚠️ **Attention :** Marée descendante (coeff > ~85) = forts courants/baïnes.",
+            "high_tide_shorebreak_warning": "⚠️ **Attention :** Marée haute = shorebreak.",
             "best_tide_window": "🏄‍♂️ **Meilleur à mi-marée.**"
         }
         

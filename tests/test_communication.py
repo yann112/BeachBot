@@ -10,7 +10,7 @@ def test_mail_sending():
         'smtp_server': os.environ.get('SMTPSERVER'),
         'smtp_port': os.environ.get('SMTPORT'),
         'sender_email': os.environ.get('SENDEREMAIL'),
-        'receiver_email': os.environ.get('SENDEREMAIL'),
+        'receivers_emails': os.environ.get('SENDEREMAIL'),
         'password': os.environ.get('EMAILPASSWORD'),
     }
     sender= EmailSender(**email_config)

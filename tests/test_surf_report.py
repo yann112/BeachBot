@@ -24,7 +24,7 @@ def test_generate_surf_report():
         station_number=STATION_NUMBER,
         browser="chrome",
         headless=True,
-        model = "openrouter/quasar-alpha"
+        model = "meta-llama/llama-4-maverick:free"
     )
     
     # Generate a surf report and verify it's not empty
