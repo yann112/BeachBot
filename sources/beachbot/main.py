@@ -1,9 +1,8 @@
-from pathlib import Path
-from .surf_report import SurfReportService
 import os
 from dotenv import load_dotenv
 
-from sources.beachbot.communication import EmailSender
+from .surf_report import SurfReportService
+from .communication import EmailSender
 
 def main():
     load_dotenv()

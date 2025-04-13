@@ -41,7 +41,7 @@ BeachBot relies on environment variables for configuration. You need to create a
 
 ```dotenv
 SCRAPPER_CONFIG=<path/to/your/scrapper_config.json>
-TEST_URL=<URL_of_the_weather_data_source>
+SCRAPPER_URL=<URL_of_the_weather_data_source>
 STATION_NUMBER=<identifier_for_the_weather_station>
 SMTPSERVER=<your_smtp_server_address>
 SMTPORT=<your_smtp_server_port>
@@ -57,7 +57,7 @@ MODEL=openrouter/quasar-alpha
 Explanation of the environment variables:
 
     SCRAPPER_CONFIG: The file path to your configuration file for the data scraping process. This file likely contains settings for how the bot should extract information from the weather data source.
-    TEST_URL: The URL of the website or API endpoint from which the meteorological data is fetched.
+    SCRAPPER_URL: The URL of the website or API endpoint from which the meteorological data is fetched.
     STATION_NUMBER: An identifier (e.g., a number or code) that specifies the particular weather station or data point you are interested in.
     SMTPSERVER: The address of your SMTP (Simple Mail Transfer Protocol) server. This is required if you intend to send the generated surf reports via email. Examples include smtp.gmail.com, smtp.office365.com, etc.
     SMTPORT: The port number used by your SMTP server. Common ports are 587 (for TLS/STARTTLS) or 465 (for SSL).
