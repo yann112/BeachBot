@@ -65,7 +65,7 @@ jobs:
           OPEN_ROUTER_API_KEY: ${{ secrets.OPEN_ROUTER_API_KEY }}
           STATION_NUMBER: ${{ secrets.STATION_NUMBER }}
           SMTPSERVER: ${{ secrets.SMTPSERVER }}
-          SMTPORT: ${{ secrets.SMTPPORT }}
+          SMTPORT: ${{ secrets.SMTPORT }}
           SENDEREMAIL: ${{ secrets.SENDEREMAIL }}
           RECEIVEREMAIL: ${{ secrets.RECEIVEREMAIL }}
           EMAILPASSWORD: ${{ secrets.EMAILPASSWORD }}
