@@ -147,4 +147,5 @@ class SurfReportService:
                 self.logger.info(surf_report)
                 return surf_report
         except Exception as e:
+            self.logger.error(e)
             return f"Erreur lors de la génération du rapport de surf: {str(e)}"
