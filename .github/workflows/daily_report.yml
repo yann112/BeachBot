@@ -27,31 +27,17 @@ jobs:
 
       - name: Install Dependencies, Chromium, and Chromedriver (Alpine Container)
         run: |
-          # Update the package index
           apk update
-
-          # Install Python interpreter (python3), pip (py3-pip),
-          # Chromium browser, and Chromedriver from Alpine's repositories.
-          # --no-cache flag reduces image size, good for CI.
-          apk add --no-cache python3 py3-pip chromium chromium-chromedriver
-
-          # Ensure pip is updated (sometimes helpful)
+          apk add --no-cache git python3 py3-pip chromium chromium-chromedriver
           python -m pip install --upgrade pip
-
-          # Install Python dependencies from requirements.txt using pip
           pip install -r requirements.txt
-
-          # Optional: Verify installation of Chromium (and chromedriver if it has a command)
           echo "Chromium version:"
           chromium --version || echo "Chromium command not found"
           echo "Chromedriver version:"
-          # Note: The chromedriver package might not always add the executable directly to the PATH
-          # or its command might be named differently. Selenium Manager handles finding it anyway.
           chromedriver --version || echo "Chromedriver command not found in PATH"
 
       - name: Run script
         run: |
-          # Direct stdout and stderr to run.log for later upload
           python -m sources.beachbot.main 2>&1 | tee run.log
         env:
           OPEN_ROUTER_API_KEY: ${{ secrets.OPEN_ROUTER_API_KEY }}
