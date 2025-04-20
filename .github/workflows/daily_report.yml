@@ -10,7 +10,6 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: selenium/standalone-chrome:latest
-      user: root
 
     environment: production
     steps:
