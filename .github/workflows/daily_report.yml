@@ -7,7 +7,7 @@ on:
 jobs:
   build_and_run:
     runs-on: ubuntu-latest  # Use the latest Ubuntu runner
-
+    environment: production
     services:
       firefox:
         image: selenium/standalone-firefox:latest  # Use the Firefox standalone service
