@@ -29,6 +29,7 @@ jobs:
 
       - name: Run script
         run: |
+          echo "Station number from secrets: $STATION_NUMBER"
           . .venv/bin/activate
           python -m sources.beachbot.main
         env:
