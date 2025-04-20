@@ -141,7 +141,7 @@ class SurfReportService:
             ) as scraper:
                 # Get forecast data
                 forecast_data = scraper.get_formatted_forecast(num_forecasts)
-                
+                self.logger.info(forecast_data)
                 # Generate surf report using the LLM
                 surf_report = self.prompt_generator.get_surf_report(forecast_data)
                 self.logger.info(surf_report)
