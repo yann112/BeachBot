@@ -10,7 +10,7 @@ def main():
 
     logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
     logger = logging.getLogger(__name__)
-
+    logger.info("Starting Surf Report Service")
     service = SurfReportService(
         logger=logger,
         url=os.environ.get('SCRAPPER_URL'),
@@ -21,7 +21,7 @@ def main():
     )
 
     report = service.generate_surf_report()
-
+    logger.info("Starting Mail Service")
     email_config = {
         'smtp_server': os.environ.get('SMTPSERVER'),
         'smtp_port': os.environ.get('SMTPORT'),
