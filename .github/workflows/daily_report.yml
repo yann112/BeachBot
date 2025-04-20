@@ -44,7 +44,34 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+  
+      - name: Debug Secret Lengths # Temporary debugging step
+        run: |
+          echo "Checking lengths of environment variables from secrets:"
+          # Define the list of environment variable names to check
+          VARS_TO_CHECK="OPEN_ROUTER_API_KEY STATION_NUMBER SMTPSERVER SMTPORT SENDEREMAIL RECEIVEREMAIL EMAILPASSWORD browser model"
 
+          # Loop through each variable name and print its length
+          for var_name in $VARS_TO_CHECK; do
+            # Get the value of the environment variable
+            # Use '${!var_name}' to get the value of the variable whose name is stored in var_name
+            # Use '-z' check and default to empty string in case the variable is literally not set
+            var_value="${!var_name:-}"
+            # Print the variable name and the length of its value
+            echo "$var_name Length: ${#var_value}"
+          done
+        env:
+          # Explicitly pass all the secrets as environment variables to this step
+          OPEN_ROUTER_API_KEY: ${{ secrets.OPEN_ROUTER_API_KEY }}
+          STATION_NUMBER: ${{ secrets.STATION_NUMBER }}
+          SMTPSERVER: ${{ secrets.SMTPSERVER }}
+          SMTPORT: ${{ secrets.SMTPPORT }}
+          SENDEREMAIL: ${{ secrets.SENDEREMAIL }}
+          RECEIVEREMAIL: ${{ secrets.RECEIVEREMAIL }}
+          EMAILPASSWORD: ${{ secrets.EMAILPASSWORD }}
+          browser: ${{ secrets.browser }}
+          model: ${{ secrets.model }}
+  
       - name: Run script
         run: |
           python -m sources.beachbot.main
