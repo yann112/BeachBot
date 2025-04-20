@@ -19,7 +19,7 @@ def test_generate_surf_report():
     
     # Create the service
     service = SurfReportService(
-        config_path=str(config_path),
+        # config_path=str(config_path),
         url=TEST_URL,
         station_number=STATION_NUMBER,
         browser="chrome",

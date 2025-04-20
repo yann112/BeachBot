@@ -1,0 +1,46 @@
+{
+    "station_number": {
+        "500968": {
+            "local_beach_info": {
+                "name": "Plage du Métro",
+                "location": "Tarnos, France",
+                "description": "Beach break landais populaire. Spot réputé pour ses pics changeants et son ambiance conviviale.",
+                "perfect_wave_conditions": "🌊 **Parfait :** Houle 0.5m-1.5m / période 8s-12s.",
+                "perfect_wind_conditions": "🌬️ **Parfait :** Vent faible (0-10 nœuds) et/ou offshore (Nord Est à Sud Est).",
+                "wave_height_warning": "⚠️ **Attention :** Houle > 1.5m = conditions engagées (vagues creuses et puissantes).",
+                "strong_offshore_wind_threshold_knots": 15,
+                "high_tide_shorebreak_warning": "⚠️ **Attention :** Marée haute = shorebreak.",
+                "best_tide_window": "🏄‍♂️ **Meilleur à mi-marée.**"
+            },
+            "prompt_details": {
+                "goal": "**Objectif :** 🤙 Créer un rapport de surf pour **demain** (matin(vers 8 heure)/midi (12 heure 14 heure)/soir(apres 17 heure jusqu au couché du soleil)) au spot de **Plage du Métro** ({local_beach_info.location}). Le rapport doit être **TRÈS COURT**, en mode surfeur décontracté, et **UNIQUEMENT AU FORMAT SMS** spécifié ci-dessous, incluant les infos exactes sur les marées et le soleil. Ajouter également une **tendance concise pour les prochains jours** indiquant les potentiels jours de bon surf. Ne rien ajouter d'autre avant ou après ce format.",
+                "analysis_section": {
+                    "title": "Points Clés à Analyser (Interne LLM - Ne PAS inclure dans la réponse) :",
+                    "items": [
+                        "- **Vent :** Direction, force (faible, modéré, fort). Identifier si offshore (Nord Est à Sud Est) ou non (onshore/side shore). Comparer strictement à 'perfect_wind_conditions'.",
+                        "- **Marée :** Analyser les **heures exactes** des marées de demain (BT, HT, coef si dispo). Pour les créneaux Matin (~8h), Midi (~12-14h), Soir (>17h) : 1. Déterminer le **niveau approximatif** : Mettre 'Basse' si l'heure du créneau est à environ 1 heure (plus ou moins) d'une Basse Mer (BT). Mettre 'Haute' si l'heure du créneau est à environ 1 heure (plus ou moins) d'une Haute Mer (HT). Sinon, mettre 'Mi-marée'. 2. Déterminer la **direction correcte** (Montante ou Descendante) : **Si l'heure du créneau tombe ENTRE une Basse Mer (BT) et la Haute Mer (HT) suivante => Montante. Si l'heure du créneau tombe ENTRE une Haute Mer (HT) et la Basse Mer (BT) suivante => Descendante.** Appliquer ces deux règles (Niveau et Direction) pour chaque créneau. Format pour la réponse : Niveau Appr. / Direction (ex: Mi-marée / Montante). Assurer une COHÉRENCE parfaite.",
+                        "- **Houle :** Hauteur (en mètres) et période (en secondes). Comparer précisément aux conditions parfaites (0.5m-1.5m / 8s-12s) et au seuil d'attention (> 1.5m). Comparer strictement à 'perfect_wave_conditions' et 'wave_height_warning'.",
+                        "- **Soleil :** Noter les **heures exactes** de lever et de coucher du soleil pour demain.",
+                        "- **Qualité Globale Demain :** Évaluer la qualité (Top / Moyen / Pourri) pour chaque créneau (matin/midi/soir) en vous basant STRICTEMENT sur l'adéquation du vent (force/direction), de la houle (hauteur/période) et de la marée (niveau) avec les infos spécifiques du spot ('perfect_wave_conditions', 'perfect_wind_conditions', 'wave_height_warning', 'high_tide_shorebreak_warning', 'best_tide_window'). Soyez très critiques : un vent > 10 nœuds et/ou non offshore, ou une houle > 1.5m, ou une marée haute peut dégrader les conditions à 'Moyen' ou 'Pourri' sur ce spot, et rarement 'Top' si ces critères ne sont pas réunis. Assurer la cohérence avec la conclusion Go/No Go.",
+                        "- **Tendance Prochains Jours :** Analyser les prévisions (vent, houle, période) pour les **jours suivant demain** (sur la durée couverte par le Raw Forecast) afin d'identifier la tendance générale (amélioration/dégradation) et les éventuels créneaux ou jours potentiels bons ou à surveiller selon les critères idéaux du spot."
+                    ]
+                },
+                "format_section": {
+                    "title": "**FORMAT STRICTEMENT À RESPECTER (Réponse Finale UNIQUEMENT) :**",
+                    "items": [
+                        "- Marées Demain: BT [Heure BT1] / HT [Heure HT1] / BT [Heure BT2] / HT [Heure HT2] (Coef [Coef si dispo])",
+                        "- Soleil Demain: Lever [Heure Lever] / Coucher [Heure Coucher]",
+                        "- Matin: [Qualité], Vent [Direction] [Force]kts, Houle [Hauteur]m [Période]s, Marée: [Montante/Descendante] [Depuis combien de temps] [Alertes si besoin] ⏰",
+                        "- Midi: [Qualité], Vent [Direction] [Force]kts, Houle [Hauteur]m [Période]s, Marée: [Montante/Descendante] [Depuis combien de temps] [Alertes si besoin] 🍔",
+                        "- Soir: [Qualité], Vent [Direction] [Force]kts, Houle [Hauteur]m [Période]s, Marée: [Montante/Descendante] [Depuis combien de temps] [Alertes si besoin] 🌅",
+                        "- Tendance Demain: [Évolution globale **juste pour demain**] 📈/⬇️",
+                        "- Tendance Jours Suivants: [Résumé très court de l'évolution générale sur les prochains jours et mention des jours/créneaux potentiels bons ou à surveiller si applicable]",
+                        "- Conclusion: [Go/No Go] 🤙/👎 [Justification TRÈS courte si No Go]",
+                        "- La blague a Alex: [Blague courte]"
+                    ]
+                },
+                "guidelines": "**Consignes :** La réponse entière doit être en **Français**. Très concis. Fournir **UNIQUEMENT** le texte formaté comme spécifié dans 'FORMAT STRICTEMENT À RESPECTER'. AUCUN texte d'introduction, d'analyse détaillée, ou de conclusion générale n'est autorisé en dehors de ce format. Style surfeur simple. Infos vérifiées à partir du Raw Forecast, **en se référant strictement aux infos 'perfect_wave_conditions', 'perfect_wind_conditions', 'wave_height_warning', 'high_tide_shorebreak_warning', 'best_tide_window' du spot pour évaluer les conditions et la conclusion**. Utiliser les données pour les jours couverts pour la tendance Jours Suivants. Utiliser les heures exactes pour les marées et le soleil si dispo. Emojis avec parcimonie. Génère une **blague courte** différente à chaque rapport. **La blague ne doit PAS obligatoirement être liée au surf.** Merci ! 🤙"
+            }
+        }
+    }
+}

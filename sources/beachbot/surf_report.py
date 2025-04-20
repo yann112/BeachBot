@@ -1,7 +1,8 @@
 import json
+import logging
 from pathlib import Path
-from typing import Dict, Any, Optional
-from datetime import date, timedelta
+from typing import Dict, Any
+from datetime import date
 
 from .llm import OpenRouterClient
 from ..wgscraper.sources.wgscraper.scraper import ScraperWg
@@ -12,15 +13,15 @@ class SurfReportPromptGenerator:
     pre-organized weather data from a scraper.
     """
     
-    def __init__(self, local_beach_info: Dict[str, str], openrouter_client):
+    def __init__(self, station_infos: Dict[str, str], openrouter_client):
         """
         Initialize the SurfReportPromptGenerator with beach info and LLM client.
         
         Args:
-            local_beach_info: Dictionary with beach information (name, location, description, best conditions)
+            station_infos: Dictionary with beach information (name, location, description, best conditions)
             openrouter_client: OpenRouter client instance for making LLM requests
         """
-        self.local_beach_info = local_beach_info
+        self.station_infos = station_infos
         self.client = openrouter_client
     
     def generate_prompt(self, forecast_data: Dict[str, Any]) -> str:
@@ -34,49 +35,17 @@ class SurfReportPromptGenerator:
             str: The complete prompt for the LLM
         """
         today = date.today()
-        tomorrow = today + timedelta(days=1)
-        tomorrow_str_long = tomorrow.strftime('%A %d %B')
         
         prompt = f"""
-            🏄‍♂️🤙 Report de surf **TRÈS COURT** pour demain, {tomorrow_str_long}, mode surfeur cool et **ULTRA CONCIS** pour SMS.
+            Today : {today.strftime('%A %d %B')}
 
-            Date du jour : {today.strftime('%A %d %B')}
+            **Station Infos :**
+            {self.station_infos}
 
-            **Infos Spot :**
-            - Nom : {self.local_beach_info['name']} ({self.local_beach_info['location']})
-            - Description : {self.local_beach_info['description']}
-            - {self.local_beach_info['perfect_wave_conditions']}
-            - {self.local_beach_info['perfect_wind_conditions']}
-            - {self.local_beach_info.get('best_tide_window', '')}
-
-            **Avertissements :**
-            - {self.local_beach_info.get('wave_height_warning', '')}
-            - {self.local_beach_info.get('strong_offshore_wind_effect', '')}
-            - {self.local_beach_info.get('high_tide_shorebreak_warning', '')}
-            - {self.local_beach_info.get('rip_current_warning', '')}
-            - **Seuil approximatif fort coefficient de marée :** ~{self.local_beach_info.get('strong_tide_approx', 85)}
-
-            **Prévisions Brutes (pour analyse) :**
+            **Raw Forecast(for analysis) :**
             ```
             {json.dumps(forecast_data, indent=2, ensure_ascii=False)}
             ```
- 
-            **Objectif :** Indique en quelques mots si ça vaut le coup de surfer demain (matin/midi/soir), en te basant sur les prévisions de vent et de houle et les infos du spot.
-
-            **Analyse Concise :**
-            - **Vent :** Indique direction et force (faible, modéré, fort). Signale si offshore (idéal si faible).
-            - **Houle :** Indique hauteur et période. Signale si dans la fenêtre parfaite (0.5m-1.5m / 8s-12s).
-            - **Marée :** Indique niveau (haute, basse, mi-marée) si info dispo.
- 
-            **Format SMS (ULTRA COURT) :**
-            - **Matin :** (Qualité (Top/Moyen/Bof) + Vent + Houle + Marée + Alertes si besoin) ⏰
-            - **Midi :** (Idem) 🍔
-            - **Soir :** (Idem) 🌅 
-            - **Tendance :** (Évolution houle/vent) 📈/⬇️
-            - **Conclusion :** (Go/No Go) 🤙/👎 
-            - **La blague a Alex::**
-
-            **Consignes :** Très concis, style surfeur simple, infos vérifiées, emojis sparingly, jours ouvrés only,  blague type "https://jokes-de-papa.com/" par contre reste trés serieux pour le reste du report,. Merci ! 🤙
             """
         return prompt
     
@@ -105,44 +74,52 @@ class SurfReportService:
     A service class that coordinates scraping weather data and generating surf reports.
     """
     
-    def __init__(self, config_path: str, url: str, station_number: int, browser: str = "chrome", headless: bool = True, model: str = None):
+    def __init__(
+        self,
+        station_number: int,
+        url: str = "https://www.windguru.cz/",
+        browser: str = "chrome",
+        headless: bool = True,
+        model: str = None,
+        scrapper_config_path: str = None,
+        beachbot_config_path: str = None,
+        logger: logging.getLogger = None
+            ):
         """
         Initialize the SurfReportService.
         
         Args:
-            config_path: Path to the scraper configuration file
+            scrapper_config_path: Path to the scraper configuration file
+            beachbot_config_path: Path to the beachbot config
             url: URL to scrape weather data from
             station_number: Station number for weather data
             browser: Browser to use for scraping
             headless: Whether to use headless browser mode
         """
-        self.config_path = config_path
+        self.logger = logger or logging.getLogger(__file__)
+        self.scrapper_config_path = scrapper_config_path or (Path(__file__).parents[1] / 'wgscraper' / 'scraping_config.json')
+        self.beachbot_config = self._read_beachbot_config(beachbot_config_path)
         self.url = url
         self.station_number = station_number
         self.browser = browser
         self.headless = headless
         self.model=model
         
-        self.local_beach_info = {
-            "name": "Plage du Métro",
-            "location": "Tarnos, France",
-            "description": "Beach break landais populaire. Spot réputé pour ses pics changeants et son ambiance conviviale.",
-            "perfect_wave_conditions": "🌊 **Parfait :** Houle 0.5m-1.5m / période 8s-12s.",
-            "perfect_wind_conditions": "🌬️ **Parfait :** Vent faible (0-10 nœuds) et/ou offshore (NE à SE).",
-            "wave_height_warning": "⚠️ **Attention :** Houle > 1.5m = conditions engagées (vagues creuses et puissantes).",
-            "strong_offshore_wind_threshold_knots": 15,
-            "strong_offshore_wind_effect": f"💨 **Attention :** Vent offshore > {15} nœuds = take-off difficile (vagues trop creuses).",
-            "high_tide_shorebreak_warning": "⚠️ **Attention :** Marée haute = shorebreak.",
-            "best_tide_window": "🏄‍♂️ **Meilleur à mi-marée.**"
-        }
-        
+        self.station_infos= self.beachbot_config["station_number"][str(self.station_number)]
         # Initialize OpenRouter client
         self.llm_client = OpenRouterClient(model=self.model)
         
         # Initialize prompt generator
-        self.prompt_generator = SurfReportPromptGenerator(self.local_beach_info, self.llm_client)
+        self.prompt_generator = SurfReportPromptGenerator(self.station_infos, self.llm_client)
     
-    def generate_surf_report(self, num_forecasts: int = 20) -> str:
+    def _read_beachbot_config(self, config_path):
+        default_path = Path(__file__).parents[2] / 'bot_config.json'
+        file_path = config_path if config_path is not None else default_path
+        with open(file_path, 'r') as f:
+            config_data = json.load(f)
+        return config_data
+
+    def generate_surf_report(self, num_forecasts: int = None) -> str:
         """
         Generate a surf report by scraping weather data and passing it to the LLM.
         
@@ -155,7 +132,8 @@ class SurfReportService:
         try:
             # Scrape weather data
             with ScraperWg(
-                config_path=self.config_path,
+                logger=self.logger,
+                config_path=self.scrapper_config_path,
                 url=self.url,
                 station_number=self.station_number,
                 browser=self.browser,
@@ -166,47 +144,7 @@ class SurfReportService:
                 
                 # Generate surf report using the LLM
                 surf_report = self.prompt_generator.get_surf_report(forecast_data)
-                
+                self.logger.info(surf_report)
                 return surf_report
         except Exception as e:
             return f"Erreur lors de la génération du rapport de surf: {str(e)}"
-    
-    @staticmethod
-    def get_default_config_path() -> str:
-        """
-        Get the default path to the scraper configuration file.
-        
-        Returns:
-            str: Path to the configuration file
-        """
-        # Get the path to the root directory
-        root_path = Path(__file__).parents[1]
-        
-        # Construct the path to the config file
-        config_path = root_path / "sources" / "wgscraper" / 'scraping_config.json'
-        
-        return str(config_path)
-
-
-# Example of how to use the class
-if __name__ == "__main__":
-    # Constants for the example
-    TEST_URL = "https://example.com/weather-data"  # Replace with your actual URL
-    STATION_NUMBER = 500968
-    
-    # Get the default config path
-    config_path = SurfReportService.get_default_config_path()
-    print(f"Using config from: {config_path}")
-    
-    # Create the service and generate a surf report
-    service = SurfReportService(
-        config_path=config_path,
-        url=TEST_URL,
-        station_number=STATION_NUMBER,
-        browser="chrome",
-        headless=True
-    )
-    
-    # Generate and print the surf report
-    report = service.generate_surf_report(num_forecasts=20)
-    print(report)
