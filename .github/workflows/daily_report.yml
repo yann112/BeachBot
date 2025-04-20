@@ -33,7 +33,7 @@ jobs:
         with:
           python-version: '3.11'
 
-- name: Install Google Chrome and Chromedriver # Update step name
+      - name: Install Google Chrome and Chromedriver # Update step name
         run: |
           # Add Google's official Linux repository
           wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
