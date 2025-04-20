@@ -13,7 +13,7 @@ class SurfReportPromptGenerator:
     pre-organized weather data from a scraper.
     """
     
-    def __init__(self, station_infos: Dict[str, str], openrouter_client):
+    def __init__(self, station_infos: Dict[str, str], openrouter_client, logger=None):
         """
         Initialize the SurfReportPromptGenerator with beach info and LLM client.
         
@@ -21,6 +21,7 @@ class SurfReportPromptGenerator:
             station_infos: Dictionary with beach information (name, location, description, best conditions)
             openrouter_client: OpenRouter client instance for making LLM requests
         """
+        self.logger = logger or logging.getLogger(__file__)
         self.station_infos = station_infos
         self.client = openrouter_client
     
