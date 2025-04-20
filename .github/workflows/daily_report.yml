@@ -1,17 +1,14 @@
 name: Daily Surf Report (Firefox)
+
 on:
   schedule:
     - cron: '0 20 * * *'  # Runs every day at 20:00 UTC
-  workflow_dispatch:  # Manually triggerable
+  workflow_dispatch:
 
 jobs:
   build_and_run:
-    runs-on: ubuntu-latest  # Use the latest Ubuntu runner
+    runs-on: ubuntu-latest
     environment: production
-    services:
-      firefox:
-        image: selenium/standalone-firefox:latest  # Use the Firefox standalone service
-        options: --shm-size=2g
 
     steps:
       - name: Checkout code
@@ -28,7 +25,7 @@ jobs:
 
       - name: Run Surf Report Script
         run: |
-        echo ${{ secrets.BROWSER }} 
+          echo ${{ secrets.BROWSER }}
           echo "Running Surf Report Generation Script..."
           . .venv/bin/activate
           python -m sources.beachbot.main
@@ -41,10 +38,10 @@ jobs:
           RECEIVEREMAIL: ${{ secrets.RECEIVEREMAIL }}
           EMAILPASSWORD: ${{ secrets.EMAILPASSWORD }}
           BROWSER: ${{ secrets.BROWSER }}
-          
+
       - name: Upload Logs Artifact
         uses: actions/upload-artifact@v4
-        if: always()  # Ensure logs are uploaded even if the workflow fails
+        if: always()
         with:
           name: workflow-logs
           path: run.log
