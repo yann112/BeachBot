@@ -30,7 +30,7 @@ jobs:
       - name: Run script
         run: |
           . .venv/bin/activate
-          python -m sources.beachbot.main 2>&1 | tee run.log
+          python -m sources.beachbot.main
         env:
           OPEN_ROUTER_API_KEY: ${{ secrets.OPEN_ROUTER_API_KEY }}
           STATION_NUMBER: ${{ secrets.STATION_NUMBER }}
