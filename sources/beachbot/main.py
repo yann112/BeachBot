@@ -5,11 +5,19 @@ from dotenv import load_dotenv
 from .surf_report import SurfReportService
 from .communication import EmailSender
 
+
+logger = logging.getLogger(__name__)
+
 def main():
     load_dotenv()
 
-    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-    logger = logging.getLogger(__name__)
+    logging.basicConfig(
+        level=logging.DEBUG,
+        format='%(asctime)s - %(levelname)s - %(message)s',
+        filename='run.log',
+        filemode='w'
+    )
+    
     logger.info("Starting Surf Report Service")
     service = SurfReportService(
         logger=logger,
