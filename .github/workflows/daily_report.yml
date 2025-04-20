@@ -1,7 +1,6 @@
 name: Daily Surf Report
 
 on:
-  # Schedule the workflow to run daily at 20:00 UTC
   schedule:
     - cron: '0 20 * * *'
   workflow_dispatch:
@@ -26,16 +25,16 @@ jobs:
       - name: Install Python, Venv, Dependencies, Chromium/Chromedriver
         run: |
           apk add --no-cache python3 py3-pip chromium chromium-chromedriver
+
           python3 -m venv .venv && \
           . .venv/bin/activate && \
           pip install --upgrade pip && \
           pip install -r requirements.txt
 
-          # Optional: Add verification steps for debugging
-          echo "Python executable used by pip:"
-          . .venv/venv/bin/activate && which python # Verify python path in venv
-          echo "Pip executable used:"
-          . .venv/venv/bin/activate && which pip # Verify pip path in venv
+          echo "Python executable used by pip (expected in .venv/bin/):"
+          . .venv/bin/activate && which python
+          echo "Pip executable used (expected in .venv/bin/):"
+          . .venv/bin/activate && which pip
           echo "Chromium version:"
           chromium --version || echo "Chromium command not found"
           echo "Chromedriver version:"
@@ -46,7 +45,6 @@ jobs:
           . .venv/bin/activate
           python -m sources.beachbot.main 2>&1 | tee run.log
         env:
-
           OPEN_ROUTER_API_KEY: ${{ secrets.OPEN_ROUTER_API_KEY }}
           STATION_NUMBER: ${{ secrets.STATION_NUMBER }}
           SMTPSERVER: ${{ secrets.SMTPSERVER }}
