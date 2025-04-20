@@ -44,21 +44,12 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-    
-            # --- Debugging Steps ---
-      - name: Debug Working Directory
-        run: pwd
-
-      - name: Debug wgscraper submodule contents
-        run: ls -lR sources/wgscraper/
-
-      - name: Debug Python sys.path
-        run: python -c "import sys; print(sys.path)"
-      # --- End Debugging Steps ---
 
       - name: Run tests
         run: |
+          cd tests
           python -m pytest
+          cd ..
       - name: Run script
         run: |
           python -m sources.beachbot.main
