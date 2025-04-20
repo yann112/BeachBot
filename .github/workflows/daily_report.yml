@@ -1,17 +1,16 @@
-name: Daily Surf Report
-
+name: Daily Surf Report (Firefox)
 on:
   schedule:
-    - cron: '0 20 * * *'
-  workflow_dispatch:
+    - cron: '0 20 * * *'  # Runs every day at 20:00 UTC
+  workflow_dispatch:  # Manually triggerable
 
 jobs:
   build_and_run:
-    runs-on: ubuntu-latest
-    environment: production
+    runs-on: ubuntu-latest  # Use the latest Ubuntu runner
+
     services:
-      chrome:
-        image: selenium/standalone-chrome:latest
+      firefox:
+        image: selenium/standalone-firefox:latest  # Use the Firefox standalone service
         options: --shm-size=2g
 
     steps:
@@ -27,24 +26,24 @@ jobs:
           pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run script
+      - name: Run Surf Report Script
         run: |
-          echo "Station number from secrets: $STATION_NUMBER"
+          echo "Running Surf Report Generation Script..."
           . .venv/bin/activate
           python -m sources.beachbot.main
         env:
           OPEN_ROUTER_API_KEY: ${{ secrets.OPEN_ROUTER_API_KEY }}
           STATION_NUMBER: ${{ secrets.STATION_NUMBER }}
           SMTPSERVER: ${{ secrets.SMTPSERVER }}
-          SMTPORT: ${{ secrets.SMTPPORT }}
+          SMTPORT: ${{ secrets.SMTPORT }}
           SENDEREMAIL: ${{ secrets.SENDEREMAIL }}
           RECEIVEREMAIL: ${{ secrets.RECEIVEREMAIL }}
           EMAILPASSWORD: ${{ secrets.EMAILPASSWORD }}
-          browser: ${{ secrets.browser }}
-
+          BROWSER: ${{ secrets.BROWSER }}  # Make sure the 'BROWSER' secret is set to 'firefox'
+          
       - name: Upload Logs Artifact
         uses: actions/upload-artifact@v4
-        if: always()
+        if: always()  # Ensure logs are uploaded even if the workflow fails
         with:
           name: workflow-logs
           path: run.log
