@@ -8,10 +8,12 @@ on:
 jobs:
   build_and_run:
     runs-on: ubuntu-latest
-    container:
-      image: selenium/standalone-chrome:latest
 
-    environment: production
+    services:
+      chrome:
+        image: selenium/standalone-chrome:latest
+        options: --shm-size=2g
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -20,15 +22,10 @@ jobs:
 
       - name: Setup Python Venv and Install Dependencies
         run: |
-          python3 -m venv .venv && \
-          . .venv/bin/activate && \
-          pip install --upgrade pip && \
+          python3 -m venv .venv
+          . .venv/bin/activate
+          pip install --upgrade pip
           pip install -r requirements.txt
-
-          echo "Chrome version in container:"
-          google-chrome --version || chromium --version || echo "Chrome/Chromium not found"
-          echo "Chromedriver version in container:"
-          chromedriver --version || echo "Chromedriver not found"
 
       - name: Run script
         run: |
