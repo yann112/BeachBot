@@ -28,6 +28,7 @@ jobs:
 
       - name: Run Surf Report Script
         run: |
+        echo ${{ secrets.BROWSER }} 
           echo "Running Surf Report Generation Script..."
           . .venv/bin/activate
           python -m sources.beachbot.main
@@ -39,7 +40,7 @@ jobs:
           SENDEREMAIL: ${{ secrets.SENDEREMAIL }}
           RECEIVEREMAIL: ${{ secrets.RECEIVEREMAIL }}
           EMAILPASSWORD: ${{ secrets.EMAILPASSWORD }}
-          BROWSER: ${{ secrets.BROWSER }}  # Make sure the 'BROWSER' secret is set to 'firefox'
+          BROWSER: ${{ secrets.BROWSER }}
           
       - name: Upload Logs Artifact
         uses: actions/upload-artifact@v4
