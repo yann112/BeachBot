@@ -27,10 +27,10 @@ jobs:
         with:
           submodules: true
       # Set up Python
-      - name: Set up Python 3.x
+      - name: Set up Python 3.11
         uses: actions/setup-python@v5
         with:
-          python-version: '3.x' # Use any 3.x version, e.g., '3.9', '3.10', '3.11'
+          python-version: '3.11'
 
       # Install system dependencies for headless Chrome
       - name: Install Chromium
