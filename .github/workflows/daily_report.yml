@@ -45,16 +45,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
       
-      - name: Debug STATION_NUMBER secret # Temporary debugging step
-        run: |
-          echo "Checking STATION_NUMBER environment variable length:"
-          # Print the length of the environment variable value
-          echo "${{ secrets.STATION_NUMBER }}" | wc -c
-        env:
-          STATION_NUMBER: ${{ secrets.STATION_NUMBER }}
-      # Set environment variables from GitHub Secrets
-      # Reference your secrets here.
-      # Make sure the names match exactly what you set in GitHub repo settings.
       - name: Run script
         run: |
           python -m pytest
@@ -69,3 +59,10 @@ jobs:
           EMAILPASSWORD: ${{ secrets.EMAILPASSWORD }}
           browser: ${{ secrets.browser }}
           model: ${{ secrets.model }}
+
+      - name: Upload Logs Artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: workflow-logs
+          path: run.log
