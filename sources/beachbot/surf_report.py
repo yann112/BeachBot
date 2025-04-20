@@ -77,7 +77,7 @@ class SurfReportService:
     def __init__(
         self,
         station_number: int,
-        url: str = "https://www.windguru.cz/",
+        url: str = None,
         browser: str = "chrome",
         headless: bool = True,
         model: str = None,
@@ -99,7 +99,7 @@ class SurfReportService:
         self.logger = logger or logging.getLogger(__file__)
         self.scrapper_config_path = scrapper_config_path or (Path(__file__).parents[1] / 'wgscraper' / 'scraping_config.json')
         self.beachbot_config = self._read_beachbot_config(beachbot_config_path)
-        self.url = url
+        self.url = url or "https://www.windguru.cz/"
         self.station_number = station_number
         self.browser = browser
         self.headless = headless
