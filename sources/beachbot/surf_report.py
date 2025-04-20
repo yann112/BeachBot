@@ -59,10 +59,11 @@ class SurfReportPromptGenerator:
         Returns:
             str: The surf report from the LLM
         """
+        self.logger.info("generating prompt")
         prompt = self.generate_prompt(forecast_data)
-        
+        self.logger.info(prompt)
         try:
-            # Call the LLM using the OpenRouter client
+            self.logger.info("calling llm")
             response = self.client(prompt)
             return response
         except Exception as e:
@@ -142,7 +143,7 @@ class SurfReportService:
                 self.logger.info("launching formatter")
                 forecast_data = scraper.get_formatted_forecast(num_forecasts)
                 self.logger.info(forecast_data)
-                # Generate surf report using the LLM
+                self.logger.info("Starting reporter")
                 surf_report = self.prompt_generator.get_surf_report(forecast_data)
                 self.logger.info(surf_report)
                 return surf_report
