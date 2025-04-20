@@ -4,7 +4,6 @@ on:
   # Schedule the workflow to run daily at 20:00 UTC
   schedule:
     - cron: '0 20 * * *'
-
   workflow_dispatch:
 
 jobs:
@@ -14,21 +13,25 @@ jobs:
       image: alpine:latest
     environment: production
     steps:
+      - name: Install Git in Alpine Container (Before Checkout)
+        run: |
+          apk update
+          apk add --no-cache git
+
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           submodules: true
-
 
       - name: Set up Python 3.11
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      - name: Install Dependencies, Chromium, and Chromedriver (Alpine Container)
+      - name: Install Dependencies, Chromium, and Chromedriver (Alpine Container - Continued)
         run: |
-          apk update
-          apk add --no-cache git python3 py3-pip chromium chromium-chromedriver
+          # Git is already installed in the previous step
+          apk add --no-cache python3 py3-pip chromium chromium-chromedriver
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           echo "Chromium version:"
