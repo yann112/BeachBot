@@ -2,7 +2,7 @@
 
 **"A bot to generate surf reports using meteo data."**
 
-This bot scrapes meteorological data and uses a language model to generate tailored reports.
+This bot scrapes meteorological data and uses a language model to generate tailored reports. It then sends these reports via email.
 It's designed with flexibility in mind, allowing for adaptation to different types of meteorological information beyond just surf conditions.
 
 ## Configuration
