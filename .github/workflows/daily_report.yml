@@ -57,6 +57,7 @@ jobs:
       # Make sure the names match exactly what you set in GitHub repo settings.
       - name: Run script
         run: |
+          python -m pytest
           python -m sources.beachbot.main
         env:
           OPEN_ROUTER_API_KEY: ${{ secrets.OPEN_ROUTER_API_KEY }}
