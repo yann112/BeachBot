@@ -1,5 +1,5 @@
 name: Daily Surf Report
-
+environment: production
 on:
   schedule:
     - cron: '0 20 * * *'
