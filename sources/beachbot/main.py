@@ -24,9 +24,9 @@ def main():
         logger=logger,
         url=os.environ.get('SCRAPPER_URL'),
         station_number=os.environ.get('STATION_NUMBER'),
-        browser=os.environ.get('browser'),
-        headless=os.environ.get('headless'),
-        model =os.environ.get('model')
+        browser=os.environ.get('BROWSER'),
+        headless=os.environ.get('HEADLESS'),
+        model =os.environ.get('MODEL')
     )
     logger.info("Service init: OK")
     report = service.generate_surf_report()

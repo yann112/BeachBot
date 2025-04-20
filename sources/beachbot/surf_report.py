@@ -78,8 +78,8 @@ class SurfReportService:
         self,
         station_number: int,
         url: str = None,
-        browser: str = "chrome",
-        headless: bool = True,
+        browser: str = None,
+        headless: bool = None,
         model: str = None,
         scrapper_config_path: str = None,
         beachbot_config_path: str = None,
@@ -101,8 +101,8 @@ class SurfReportService:
         self.beachbot_config = self._read_beachbot_config(beachbot_config_path)
         self.url = url or "https://www.windguru.cz/"
         self.station_number = station_number
-        self.browser = browser
-        self.headless = headless
+        self.browser = "chrome" or browser
+        self.headless = True or headless
         self.model=model
         
         self.station_infos= self.beachbot_config["station_number"][str(self.station_number)]
