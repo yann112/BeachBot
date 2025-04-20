@@ -33,11 +33,19 @@ jobs:
         with:
           python-version: '3.11'
 
-      # Install system dependencies for headless Chrome
-      - name: Install Chromium
+      - name: Install Google Chrome and Chromedriver # Update step name
         run: |
+          # Add Google's official Linux repository
+          wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+          sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
+
+          # Update apt-get and install google-chrome-stable
           sudo apt-get update
-          sudo apt-get install -y chromium-browser chromium-chromedriver
+          sudo apt-get install -y google-chrome-stable chromium-chromedriver # Install official Chrome and the driver
+
+          # Verify installation paths (Optional debug)
+          which google-chrome
+          which chromedriver
 
       # Install Python dependencies
       - name: Install dependencies
