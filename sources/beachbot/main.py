@@ -19,6 +19,7 @@ def main():
     )
             
     logger.info("Starting Surf Report Service")
+    logger.info(f"using browser: {os.environ.get('browser')}")
     service = SurfReportService(
         logger=logger,
         url=os.environ.get('SCRAPPER_URL'),
@@ -27,7 +28,7 @@ def main():
         headless=os.environ.get('headless'),
         model =os.environ.get('model')
     )
-
+    logger.info("Service init: OK")
     report = service.generate_surf_report()
     logger.info("Starting Mail Service")
     email_config = {

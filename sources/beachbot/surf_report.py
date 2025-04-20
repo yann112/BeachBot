@@ -130,7 +130,7 @@ class SurfReportService:
             str: The generated surf report
         """
         try:
-            # Scrape weather data
+            self.logger.info("launching Scraper")
             with ScraperWg(
                 logger=self.logger,
                 config_path=self.scrapper_config_path,
@@ -139,7 +139,7 @@ class SurfReportService:
                 browser=self.browser,
                 headless_browser=self.headless
             ) as scraper:
-                # Get forecast data
+                self.logger.info("launching formatter")
                 forecast_data = scraper.get_formatted_forecast(num_forecasts)
                 self.logger.info(forecast_data)
                 # Generate surf report using the LLM
