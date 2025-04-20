@@ -9,7 +9,7 @@ on:
 
 jobs:
   build_and_run:
-    runs-on: alpine:latest
+    runs-on: ubuntu-latest
     container:
       image: alpine:latest
     environment: production
@@ -48,33 +48,6 @@ jobs:
           # Note: The chromedriver package might not always add the executable directly to the PATH
           # or its command might be named differently. Selenium Manager handles finding it anyway.
           chromedriver --version || echo "Chromedriver command not found in PATH"
-
-
-      - name: Debug Secret Lengths
-        run: |
-          echo "Checking lengths of environment variables from secrets:"
-          # Define the list of environment variable names to check
-          VARS_TO_CHECK="OPEN_ROUTER_API_KEY STATION_NUMBER SMTPSERVER SMTPORT SENDEREMAIL RECEIVEREMAIL EMAILPASSWORD browser model"
-
-          # Loop through each variable name and print its length
-          for var_name in $VARS_TO_CHECK; do
-            # Get the value of the environment variable
-            # Use '${!var_name}' to get the value of the variable whose name is stored in var_name
-            # Use '-z' check and default to empty string in case the variable is literally not set
-            var_value="${!var_name:-}"
-            # Print the variable name and the length of its value
-            echo "$var_name Length: ${#var_value}"
-          done
-        env:
-          OPEN_ROUTER_API_KEY: ${{ secrets.OPEN_ROUTER_API_KEY }}
-          STATION_NUMBER: ${{ secrets.STATION_NUMBER }}
-          SMTPSERVER: ${{ secrets.SMTPSERVER }}
-          SMTPORT: ${{ secrets.SMTPORT }}
-          SENDEREMAIL: ${{ secrets.SENDEREMAIL }}
-          RECEIVEREMAIL: ${{ secrets.RECEIVEREMAIL }}
-          EMAILPASSWORD: ${{ secrets.EMAILPASSWORD }}
-          browser: ${{ secrets.browser }}
-          model: ${{ secrets.model }}
 
       - name: Run script
         run: |
