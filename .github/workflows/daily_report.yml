@@ -30,8 +30,9 @@ jobs:
 
       - name: Install Dependencies, Chromium, and Chromedriver (Alpine Container - Continued)
         run: |
-          # Git is already installed in the previous step
           apk add --no-cache python3 py3-pip chromium chromium-chromedriver
+          python3 -m venv .venv
+          . .venv/bin/activate
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           echo "Chromium version:"
