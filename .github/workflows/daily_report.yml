@@ -48,7 +48,7 @@ jobs:
       # Make sure the names match exactly what you set in GitHub repo settings.
       - name: Run script
         run: |
-          python -m sources.main
+          python -m sources.beachbot.main
         env:
           STATION_NUMBER: ${{ secrets.STATION_NUMBER }}
           SMTPSERVER: ${{ secrets.SMTPSERVER }}
