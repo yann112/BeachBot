@@ -33,7 +33,7 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install Google Chrome and Chromedriver # Update step name
+- name: Install Google Chrome and Chromedriver # Update step name
         run: |
           # Add Google's official Linux repository
           wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
@@ -43,17 +43,26 @@ jobs:
           sudo apt-get update
 
           # Install google-chrome-stable and chromium-chromedriver
-          # Use --no-install-recommends to try and prevent chromium-browser dependency
-          sudo apt-get install -y --no-install-recommends google-chrome-stable chromium-chromedriver
+          # Install google-chrome-stable first
+          sudo apt-get install -y --no-install-recommends google-chrome-stable
 
-          # Attempt to remove chromium-browser just in case it was already present or pulled in
-          sudo apt-get remove -y chromium-browser || true # Use || true to prevent step failure if not installed
+          # Now install chromium-chromedriver separately to ensure it's present
+          # It might have been installed already as a recommended package with google-chrome-stable,
+          # but reinstalling ensures it's there after any potential removal attempts.
+          sudo apt-get install -y chromium-chromedriver
+
+          # Attempt to remove chromium-browser only, without removing its dependents like the driver
+          # Use purge to remove config files too, just in case
+          # We are more specific with the remove command
+          sudo apt-get remove -y --purge chromium-browser || true # Removed the || true initially, but let's keep it safe
 
           # Verify installation paths
           which google-chrome
           which chromedriver
-          ls -l /usr/bin/google-chrome # Double check file presence and permissions
-          file /usr/bin/google-chrome # Verify it's an executable
+          ls -l /usr/bin/google-chrome
+          file /usr/bin/google-chrome
+          ls -l $(which chromedriver) # Verify chromedriver presence after removals
+
 
       # Install Python dependencies
       - name: Install dependencies
