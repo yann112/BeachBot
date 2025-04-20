@@ -1,57 +1,56 @@
 name: Daily Surf Report
 
-# Controls when the workflow will run
 on:
-  # Schedule the workflow to run daily.
-  # This example runs at midnight UTC every day.
-  # You can adjust the 'cron' expression for a different time.
-  # cron syntax: minute hour day_of_month month day_of_week
-  # Learn more: https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#schedule
+  # Schedule the workflow to run daily at 20:00 UTC
   schedule:
-    - cron: '0 20 * * *' # Runs at 00:00 UTC daily
+    - cron: '0 20 * * *'
 
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   build_and_run:
-    # The type of runner that the job will run on
-    runs-on: ubuntu-latest
-    environment: # <-- This links the job to an environment
-      name: production
-    # Steps represent a sequence of tasks that will be executed as part of the job
+    runs-on: alpine:latest
+    container:
+      image: alpine:latest
+    environment: production
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           submodules: true
-      # Set up Python
+
+
       - name: Set up Python 3.11
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      - name: Install Google Chrome and Chromedriver # Update step name
+      - name: Install Dependencies, Chromium, and Chromedriver (Alpine Container)
         run: |
-          # Add Google's official Linux repository
-          wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
-          sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
+          # Update the package index
+          apk update
 
-          # Update apt-get
-          sudo apt-get update
+          # Install Python interpreter (python3), pip (py3-pip),
+          # Chromium browser, and Chromedriver from Alpine's repositories.
+          # --no-cache flag reduces image size, good for CI.
+          apk add --no-cache python3 py3-pip chromium chromium-chromedriver
 
-          sudo apt-get install -y --no-install-recommends google-chrome-stable
-          sudo apt-get remove -y --purge chromium-browser
-
-      # Install Python dependencies
-      - name: Install dependencies
-        run: |
+          # Ensure pip is updated (sometimes helpful)
           python -m pip install --upgrade pip
+
+          # Install Python dependencies from requirements.txt using pip
           pip install -r requirements.txt
-  
-      - name: Debug Secret Lengths # Temporary debugging step
+
+          # Optional: Verify installation of Chromium (and chromedriver if it has a command)
+          echo "Chromium version:"
+          chromium --version || echo "Chromium command not found"
+          echo "Chromedriver version:"
+          # Note: The chromedriver package might not always add the executable directly to the PATH
+          # or its command might be named differently. Selenium Manager handles finding it anyway.
+          chromedriver --version || echo "Chromedriver command not found in PATH"
+
+
+      - name: Debug Secret Lengths
         run: |
           echo "Checking lengths of environment variables from secrets:"
           # Define the list of environment variable names to check
@@ -67,7 +66,6 @@ jobs:
             echo "$var_name Length: ${#var_value}"
           done
         env:
-          # Explicitly pass all the secrets as environment variables to this step
           OPEN_ROUTER_API_KEY: ${{ secrets.OPEN_ROUTER_API_KEY }}
           STATION_NUMBER: ${{ secrets.STATION_NUMBER }}
           SMTPSERVER: ${{ secrets.SMTPSERVER }}
@@ -77,10 +75,11 @@ jobs:
           EMAILPASSWORD: ${{ secrets.EMAILPASSWORD }}
           browser: ${{ secrets.browser }}
           model: ${{ secrets.model }}
-  
+
       - name: Run script
         run: |
-          python -m sources.beachbot.main
+          # Direct stdout and stderr to run.log for later upload
+          python -m sources.beachbot.main 2>&1 | tee run.log
         env:
           OPEN_ROUTER_API_KEY: ${{ secrets.OPEN_ROUTER_API_KEY }}
           STATION_NUMBER: ${{ secrets.STATION_NUMBER }}
@@ -90,7 +89,6 @@ jobs:
           RECEIVEREMAIL: ${{ secrets.RECEIVEREMAIL }}
           EMAILPASSWORD: ${{ secrets.EMAILPASSWORD }}
           browser: ${{ secrets.browser }}
-          model: ${{ secrets.model }}
 
       - name: Upload Logs Artifact
         uses: actions/upload-artifact@v4
