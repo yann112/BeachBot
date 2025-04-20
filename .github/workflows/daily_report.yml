@@ -1,0 +1,57 @@
+name: Daily Surf Report
+
+# Controls when the workflow will run
+on:
+  # Schedule the workflow to run daily.
+  # This example runs at midnight UTC every day.
+  # You can adjust the 'cron' expression for a different time.
+  # cron syntax: minute hour day_of_month month day_of_week
+  # Learn more: https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#schedule
+  schedule:
+    - cron: '0 20 * * *' # Runs at 00:00 UTC daily
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  build_and_run:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Set up Python
+      - name: Set up Python 3.x
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x' # Use any 3.x version, e.g., '3.9', '3.10', '3.11'
+
+      # Install system dependencies for headless Chrome
+      - name: Install Chromium
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y chromium-browser chromium-chromedriver
+
+      # Install Python dependencies
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # Set environment variables from GitHub Secrets
+      # Reference your secrets here.
+      # Make sure the names match exactly what you set in GitHub repo settings.
+      - name: Run script
+        run: |
+          python -m sources.main.py
+        env:
+          STATION_NUMBER: ${{ secrets.STATION_NUMBER }}
+          SMTPSERVER: ${{ secrets.SMTPSERVER }}
+          SMTPORT: ${{ secrets.SMTPORT }}
+          SENDEREMAIL: ${{ secrets.SENDEREMAIL }}
+          EMAILPASSWORD: ${{ secrets.EMAILPASSWORD }}
