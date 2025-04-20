@@ -50,6 +50,16 @@ jobs:
           cd tests
           python -m pytest
           cd ..
+        env:
+          OPEN_ROUTER_API_KEY: ${{ secrets.OPEN_ROUTER_API_KEY }}
+          STATION_NUMBER: ${{ secrets.STATION_NUMBER }}
+          SMTPSERVER: ${{ secrets.SMTPSERVER }}
+          SMTPORT: ${{ secrets.SMTPORT }}
+          SENDEREMAIL: ${{ secrets.SENDEREMAIL }}
+          RECEIVEREMAIL: ${{ secrets.RECEIVEREMAIL }}
+          EMAILPASSWORD: ${{ secrets.EMAILPASSWORD }}
+          browser: ${{ secrets.browser }}
+          model: ${{ secrets.model }}
       - name: Run script
         run: |
           python -m sources.beachbot.main
