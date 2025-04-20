@@ -39,13 +39,21 @@ jobs:
           wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
           sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
 
-          # Update apt-get and install google-chrome-stable
+          # Update apt-get
           sudo apt-get update
-          sudo apt-get install -y google-chrome-stable chromium-chromedriver # Install official Chrome and the driver
 
-          # Verify installation paths (Optional debug)
+          # Install google-chrome-stable and chromium-chromedriver
+          # Use --no-install-recommends to try and prevent chromium-browser dependency
+          sudo apt-get install -y --no-install-recommends google-chrome-stable chromium-chromedriver
+
+          # Attempt to remove chromium-browser just in case it was already present or pulled in
+          sudo apt-get remove -y chromium-browser || true # Use || true to prevent step failure if not installed
+
+          # Verify installation paths
           which google-chrome
           which chromedriver
+          ls -l /usr/bin/google-chrome # Double check file presence and permissions
+          file /usr/bin/google-chrome # Verify it's an executable
 
       # Install Python dependencies
       - name: Install dependencies
