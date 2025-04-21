@@ -38,6 +38,7 @@ jobs:
           RECEIVEREMAIL: ${{ secrets.RECEIVEREMAIL }}
           EMAILPASSWORD: ${{ secrets.EMAILPASSWORD }}
           BROWSER: ${{ secrets.BROWSER }}
+          MODEL: ${{ secrets.MODEL }}
 
       - name: Upload Logs Artifact
         uses: actions/upload-artifact@v4
